@@ -1,0 +1,16 @@
+
+msgid ""
+msgstr ""
+"Project-Id-Version: See in pyproject.toml\n"
+"Report-Msgid-Bugs-To: GitHub bug tracker\n"
+"POT-Creation-Date: 2023-01-26 19:50+0100\n"
+"PO-Revision-Date: 2023-01-26 19:50+0100\n"
+"Last-Translator: Perchun Pak <perchunpak@gmail.com>\n"
+"Language: en\n"
+"Language-Team: English\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.1\n"
+

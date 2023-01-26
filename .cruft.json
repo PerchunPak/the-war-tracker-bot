@@ -1,0 +1,24 @@
+{
+  "template": "https://github.com/PerchunPak/python-template",
+  "commit": "52423d1fa97a2adb7c0ab304acfee1660cb8a8b4",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "the-war-tracker-bot",
+      "organization": "PerchunPak",
+      "project_description": "The bot that doom-scrolls through the war news for you!",
+      "other_languages_support": "y",
+      "ukrainian_language_support": "y",
+      "russian_language_support": "n",
+      "license": "BSD3",
+      "_copy_without_render": [
+        ".venv",
+        "docs/_build",
+        "docs/_autoapi_templates/python",
+        ".github/workflows"
+      ],
+      "_template": "https://github.com/PerchunPak/python-template"
+    }
+  },
+  "directory": null
+}
