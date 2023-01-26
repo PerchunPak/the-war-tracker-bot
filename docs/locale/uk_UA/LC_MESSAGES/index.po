@@ -63,7 +63,7 @@ msgstr "Бейдж із підтримуваними версіями Python (з
 
 #: ../../../README.md:42
 msgid "The bot that doom-scrolls through the war news for you!"
-msgstr ""
+msgstr "Бот, який дум-скролить новини про війну за вас!"
 
 #: ../../../README.md:45
 msgid ""
