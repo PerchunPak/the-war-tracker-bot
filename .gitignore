@@ -1,3 +1,4 @@
+config.yml
 
 # Ignore false-positive created files for the API translation. It is deactivated for non-English language.
 /docs/locale/**/LC_MESSAGES/api/twtb/**/*.po

@@ -21,6 +21,7 @@ omegaconf = "~2.3"
 loguru = "~0.6"
 
 typing-extensions = "*"
+telethon = "~1.27"
 
 
 [tool.poetry.group.make.dependencies]
