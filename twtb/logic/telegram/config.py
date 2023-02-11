@@ -6,7 +6,6 @@ import dataclasses
 class TelegramConfigSection:
     """Config for telegram specific settings."""
 
-    enabled: bool = True
     api_id: int = "???"  # type: ignore[assignment]
     api_hash: str = "???"
     phone: str = "???"

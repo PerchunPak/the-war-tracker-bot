@@ -1,24 +1,25 @@
 """Package for the Telegram related logic."""
-import asyncio
-
-import telethon
+import telethon.events
 
 from twtb import config as config_module
+from twtb.logic.telegram.on_message import register as register_hook
 
 
-async def run(client: telethon.TelegramClient) -> None:
-    """Actually run the TG bot."""
-    await asyncio.sleep(1000)  # todo remove
-
-
-async def start() -> None:
-    """Start the bot, but do not attach to the process."""
+def run() -> None:
+    """Actually run the bot and attach to it."""
     tg_config = config_module.Config().telegram
 
-    asyncio.create_task(
-        run(
-            await telethon.TelegramClient("anon", tg_config.api_id, tg_config.api_hash).start(
-                lambda: tg_config.phone, lambda: tg_config.password
-            ),
-        ),
+    client = telethon.TelegramClient("anon", tg_config.api_id, tg_config.api_hash).start(
+        lambda: tg_config.phone, lambda: tg_config.password
     )
+    get_client._client = client  # type: ignore[attr-defined]
+    register_hook(client)
+    client.run_until_disconnected()
+
+
+def get_client() -> telethon.TelegramClient:
+    """Getter for :class:`telethon.TelegramClient`."""
+    if not hasattr(get_client, "_client"):
+        raise RuntimeError("Bot was not initialised!")
+
+    return get_client._client

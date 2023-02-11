@@ -1,16 +1,18 @@
 """Module for the :class:`.MessageHandler` class."""
-import typing as t
+from telethon.tl.custom.message import Message as TelethonMessage
 
-from twtb.logic.models import AbstractToHandle, AbstractToSend
+from twtb.logic.shared.message_sender import MessageSender
 
 
 class MessageHandler:
     """Handles message to know if they should be sent to user."""
 
-    def handle(self, to_handle: AbstractToHandle) -> t.Optional[AbstractToSend]:
+    async def handle(self, to_handle: str, message: TelethonMessage) -> None:
         """Handles message to know if they should be sent to user.
 
         Args:
             to_handle: Message to handle.
+            message: Message to forward.
         """
-        raise NotImplementedError("This is in TODO now.")
+        if "hi" in to_handle:
+            await MessageSender().send_message(["me"], message)
