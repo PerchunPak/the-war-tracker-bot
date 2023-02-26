@@ -14,7 +14,8 @@ def run() -> None:
     )
     get_client._client = client  # type: ignore[attr-defined]
     register_hooks(client)
-    client.run_until_disconnected()
+    with client:
+        client.run_until_disconnected()
 
 
 def get_client() -> telethon.TelegramClient:
