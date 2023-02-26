@@ -1,5 +1,4 @@
 """Module for ``on_message`` hook."""
-import asyncio
 
 import telethon.events
 
@@ -13,16 +12,18 @@ def register(client: telethon.TelegramClient) -> None:
     Args:
         client: Telethon's client.
     """
-    loop = asyncio.get_event_loop()
-    database = Database()
-
-    client.on(telethon.events.NewMessage(chats=loop.run_until_complete(database.get_all_channels())))(_on_message)
+    client.on(telethon.events.NewMessage())(_on_message)
     client.on(telethon.events.NewMessage(pattern=r"!subscribe (\w+)"))(_subscribe_to_word_command)
     client.on(telethon.events.NewMessage(pattern=r"!add (\w+)"))(_add_channel_command)
 
 
 async def _on_message(event: telethon.events.NewMessage.Event) -> None:
     """Hook for ``on_message`` event."""
+    database = Database()
+    channels = await database.get_all_channels()
+    if event.chat_id not in channels:
+        return
+
     await MessageHandler().handle(event.message.message, event.message)
 
 
