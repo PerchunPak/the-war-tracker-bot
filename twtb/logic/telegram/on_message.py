@@ -38,7 +38,8 @@ async def _subscribe_to_word_command(event: telethon.events.NewMessage.Event) ->
 async def _add_channel_command(event: telethon.events.NewMessage.Event) -> None:
     """``!add`` command. Adds channel to the database."""
     channel = event.pattern_match.group(1)
+    channel_id = await event.client.get_entity(channel)
     database = Database()
 
-    await database.add_chanel(channel)
+    await database.add_chanel(channel_id.id)
     await event.respond("Done!")
