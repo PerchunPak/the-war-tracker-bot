@@ -2,7 +2,7 @@
 import telethon.events
 
 from twtb import config as config_module
-from twtb.logic.telegram.on_message import register as register_hook
+from twtb.logic.telegram.on_message import register as register_hooks
 
 
 def run() -> None:
@@ -13,7 +13,7 @@ def run() -> None:
         lambda: tg_config.phone, lambda: tg_config.password
     )
     get_client._client = client  # type: ignore[attr-defined]
-    register_hook(client)
+    register_hooks(client)
     client.run_until_disconnected()
 
 
