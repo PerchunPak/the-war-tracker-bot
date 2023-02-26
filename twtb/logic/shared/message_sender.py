@@ -17,7 +17,7 @@ class MessageSender:
 
         return [TelegramSender()]
 
-    async def send_message(self, users_ids: t.List[t.Union[int, str]], message: TelethonMessage) -> None:
+    async def send_message(self, users_ids: t.List[str], message: TelethonMessage) -> None:
         """Iterate over all realisations of :class:`~twtb.logic.shared.abstractions.AbstractSender` and call them.
 
         Args:

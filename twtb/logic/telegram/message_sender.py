@@ -10,7 +10,7 @@ from twtb.logic.telegram import get_client
 class TelegramSender(AbstractSender):
     """Realisation of :class:`~twtb.logic.shared.abstractions.AbstractSender` for Telegram."""
 
-    async def send_message(self, users_ids: t.List[t.Union[int, str]], message: TelethonMessage) -> None:
+    async def send_message(self, users_ids: t.List[str], message: TelethonMessage) -> None:
         """Send message to users.
 
         Args:

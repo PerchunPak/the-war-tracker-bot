@@ -9,7 +9,7 @@ class AbstractSender(abc.ABC):
     """Abstraction for the class, that will send a message to users."""
 
     @abc.abstractmethod
-    async def send_message(self, users_ids: t.List[t.Union[int, str]], message: TelethonMessage) -> None:
+    async def send_message(self, users_ids: t.List[str], message: TelethonMessage) -> None:
         """Send message to users.
 
         Args:
