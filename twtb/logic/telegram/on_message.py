@@ -3,7 +3,7 @@ import asyncio
 
 import telethon.events
 
-from twtb.logic.db import Database
+from twtb.logic.shared.db import Database
 from twtb.logic.shared.message_handler import MessageHandler
 
 
