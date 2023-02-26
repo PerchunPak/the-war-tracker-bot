@@ -28,10 +28,10 @@ async def _on_message(event: telethon.events.NewMessage.Event) -> None:
 
 async def _subscribe_to_word_command(event: telethon.events.NewMessage.Event) -> None:
     """``!subscribe`` command. Subscribes user to word."""
-    channel = event.pattern_match.group(1)
+    word = event.pattern_match.group(1)
     database = Database()
 
-    await database.subscribe_user(event.chat.id, channel)
+    await database.subscribe_user(event.chat_id, word)
     await event.respond("Done!")
 
 
