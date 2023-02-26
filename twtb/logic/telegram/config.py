@@ -8,5 +8,4 @@ class TelegramConfigSection:
 
     api_id: int = "???"  # type: ignore[assignment]
     api_hash: str = "???"
-    phone: str = "???"
-    password: str = "???"
+    bot_token: str = "???"
