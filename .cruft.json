@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/PerchunPak/python-template",
-  "commit": "c98e24b63bd9663182cfca4284eaedc723f06f9c",
+  "commit": "27f88a58aa205d06d4b086257feb06c9096d3b6e",
   "checkout": null,
   "context": {
     "cookiecutter": {
@@ -14,8 +14,7 @@
       "_copy_without_render": [
         ".venv",
         "docs/_build",
-        "docs/_autoapi_templates/python",
-        ".github/workflows"
+        "docs/_autoapi_templates/python"
       ],
       "_template": "https://github.com/PerchunPak/python-template"
     }
