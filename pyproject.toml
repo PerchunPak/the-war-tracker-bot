@@ -48,18 +48,18 @@ pytest-cov = "~4.0"
 pytest-mock = "~3.10"
 pytest-testmon = "~1.4"
 pytest-randomly = "~3.12"
-Faker = "~15.3"
+Faker = "~17.6"
 
 
 [tool.poetry.group.docs.dependencies]
-sphinx = "~5.3"
+sphinx = "~6.1"
 sphinx-autodoc-typehints = "~1.22"
 sphinx-autoapi = "~2.0"
 sphinx-intl = "~2.1"  # only for locales
 furo = "*"
 m2r2 = "~0.3"
 tomli = { version = "~2.0", markers = "python_version < '3.11'" }
-packaging = "22.0"
+packaging = "23.0"
 
 
 [tool.poetry.group.github_hooks]
