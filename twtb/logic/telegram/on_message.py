@@ -1,9 +1,14 @@
 """Module for ``on_message`` hook."""
 
-import telethon.events
+import typing as t
+
+import telethon.events.common
+from telethon.tl.custom import Button
 
 from twtb.logic.shared.db import Database
 from twtb.logic.shared.message_handler import MessageHandler
+from twtb.logic.telegram.button_handlers import ButtonHandler
+from twtb.logic.telegram.data import ButtonData
 
 
 def register(client: telethon.TelegramClient) -> None:
@@ -13,8 +18,8 @@ def register(client: telethon.TelegramClient) -> None:
         client: Telethon's client.
     """
     client.on(telethon.events.NewMessage())(_on_message)
-    client.on(telethon.events.NewMessage(pattern=r"!subscribe (\w+)"))(_subscribe_to_word_command)
-    client.on(telethon.events.NewMessage(pattern=r"!add (\w+)"))(_add_channel_command)
+    client.on(telethon.events.NewMessage(pattern="/start"))(_start_command)
+    client.on(telethon.events.CallbackQuery())(_button_callback)
 
 
 async def _on_message(event: telethon.events.NewMessage.Event) -> None:
@@ -27,20 +32,27 @@ async def _on_message(event: telethon.events.NewMessage.Event) -> None:
     await MessageHandler().handle(event.message.message, event.message)
 
 
-async def _subscribe_to_word_command(event: telethon.events.NewMessage.Event) -> None:
-    """``!subscribe`` command. Subscribes user to word."""
-    word = event.pattern_match.group(1)
-    database = Database()
+def _get_slash_start_message() -> t.Dict[str, t.Any]:  # type: ignore[misc] # Explicit "Any" is not allowed
+    return {
+        "message": "Hello! I'm The War Tracker Bot, I will notify you for any changes in the war!",
+        "buttons": [
+            [
+                Button.inline("Subscribe to word", ButtonData.SUBSCRIBE_TO_WORD.value),
+                Button.inline("Unsubscribe from word", ButtonData.UNSUBSCRIBE_FROM_WORD.value),
+            ],
+            [
+                Button.inline("List my subscribes", ButtonData.LIST_MY_SUBSCRIBES.value),
+                Button.inline("List known channels", ButtonData.LIST_KNOWN_CHANNELS.value),
+            ],
+            [Button.inline("Add channel", ButtonData.ADD_CHANNEL.value)],
+        ],
+    }
 
-    await database.subscribe_user(event.chat_id, word)
-    await event.respond("Done!")
+
+async def _start_command(event: telethon.events.NewMessage.Event) -> None:
+    await event.respond(**_get_slash_start_message())
 
 
-async def _add_channel_command(event: telethon.events.NewMessage.Event) -> None:
-    """``!add`` command. Adds channel to the database."""
-    channel = event.pattern_match.group(1)
-    channel_id = await event.client.get_entity(channel)
-    database = Database()
-
-    await database.add_chanel(channel_id.id)
-    await event.respond("Done!")
+async def _button_callback(event: telethon.events.CallbackQuery.Event) -> None:
+    await ButtonHandler.get_handler(ButtonData(event.data)).handle(event)
+    await event.respond(**_get_slash_start_message())
