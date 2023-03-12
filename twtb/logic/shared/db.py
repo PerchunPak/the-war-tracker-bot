@@ -25,6 +25,14 @@ class Database(metaclass=twtb.utils.Singleton):
         """Subscribe user to the word."""
         await self._connection.rpush(user, word)
 
+    async def unsubscribe_user(self, user: str, word: str) -> bool:
+        """Unsubscribe user from the word.
+
+        Returns:
+            Whether word was removed.
+        """
+        return bool(await self._connection.lrem(user, 0, word))
+
     async def add_channel(self, id: int) -> None:
         """Add channel to our database."""
         await self._connection.rpush(self._CHANNELS_KEY, id)
