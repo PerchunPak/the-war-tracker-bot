@@ -25,7 +25,7 @@ class Database(metaclass=twtb.utils.Singleton):
         """Subscribe user to the word."""
         await self._connection.rpush(user, word)
 
-    async def add_chanel(self, id: int) -> None:
+    async def add_channel(self, id: int) -> None:
         """Add channel to our database."""
         await self._connection.rpush(self._CHANNELS_KEY, id)
 
