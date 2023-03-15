@@ -11,15 +11,15 @@ from twtb.logic.shared.abstractions import AbstractSender
 class MessageSender:
     """Iterates over all realisations of :class:`~twtb.logic.shared.abstractions.AbstractSender` and calls them."""
 
-    def __init__(self, client: telethon.TelegramClient) -> None:
-        self._client = client
+    def __init__(self, bot: telethon.TelegramClient) -> None:
+        self._bot = bot
 
     @functools.cached_property
     def _senders(self) -> t.List[AbstractSender]:
         """Getter for list of realisations of :class:`~twtb.logic.shared.abstractions.AbstractSender`."""
         from twtb.logic.telegram.message_sender import TelegramSender
 
-        return [TelegramSender(self._client)]
+        return [TelegramSender(self._bot)]
 
     async def send_message(self, users_ids: t.List[int], message: TelethonMessage) -> None:
         """Iterate over all realisations of :class:`~twtb.logic.shared.abstractions.AbstractSender` and call them.

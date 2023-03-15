@@ -9,9 +9,9 @@ from twtb.logic.shared.message_sender import MessageSender
 class MessageHandler:
     """Handles message to know if they should be sent to user."""
 
-    def __init__(self, client: telethon.TelegramClient) -> None:
+    def __init__(self, bot: telethon.TelegramClient) -> None:
         self._db = Database()
-        self._sender = MessageSender(client)
+        self._sender = MessageSender(bot)
 
     async def handle(self, to_handle: str, message: TelethonMessage) -> None:
         """Handles message to know if they should be sent to user.

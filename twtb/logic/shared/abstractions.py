@@ -9,8 +9,8 @@ from telethon.tl.custom.message import Message as TelethonMessage
 class AbstractSender(abc.ABC):
     """Abstraction for the class, that will send a message to users."""
 
-    def __init__(self, client: telethon.TelegramClient) -> None:
-        self._client = client
+    def __init__(self, bot: telethon.TelegramClient) -> None:
+        self._bot = bot
 
     @abc.abstractmethod
     async def send_message(self, users_ids: t.List[int], message: TelethonMessage) -> None:

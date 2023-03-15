@@ -17,4 +17,4 @@ class TelegramSender(AbstractSender):
             message: Telegram message object to send.
         """
         for user_id in users_ids:
-            await self._client.forward_messages(user_id, message)
+            await self._bot.forward_messages(user_id, message)

@@ -11,15 +11,11 @@ from twtb.logic.telegram.button_handlers import ButtonHandler
 from twtb.logic.telegram.data import ButtonData
 
 
-def register(client: telethon.TelegramClient) -> None:
-    """Register the :func:`._on_message` hook.
-
-    Args:
-        client: Telethon's client.
-    """
+def register(bot: telethon.TelegramClient, client: telethon.TelegramClient) -> None:
+    """Register the hooks in this file."""
     client.on(telethon.events.NewMessage())(_on_message)
-    client.on(telethon.events.NewMessage(pattern="/start"))(_start_command)
-    client.on(telethon.events.CallbackQuery())(_button_callback)
+    bot.on(telethon.events.NewMessage(pattern="/start"))(_start_command)
+    bot.on(telethon.events.CallbackQuery())(_button_callback)
 
 
 async def _on_message(event: telethon.events.NewMessage.Event) -> None:

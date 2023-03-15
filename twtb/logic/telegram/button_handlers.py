@@ -146,6 +146,5 @@ class AddChannelButtonHandler(ButtonHandler):
 
         database = Database()
 
-        await event.client(telethon.tl.functions.channels.JoinChannelRequest(channel))
         await database.add_channel(channel.id)
         await event.respond("Done!")
