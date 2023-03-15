@@ -11,16 +11,7 @@ def run() -> None:
     tg_config = config_module.Config().telegram
 
     client = telethon.TelegramClient("bot", tg_config.api_id, tg_config.api_hash).start(bot_token=tg_config.bot_token)
-    get_client._client = client  # type: ignore[attr-defined]
     register_hooks(client)
     # client.loop.run_until_complete(subscribe_to_all_channels(client)) # FIXME doesn't work with bot, needs userbot
     with client:
         client.run_until_disconnected()
-
-
-def get_client() -> telethon.TelegramClient:
-    """Getter for :class:`telethon.TelegramClient`."""
-    if not hasattr(get_client, "_client"):
-        raise RuntimeError("Bot was not initialised!")
-
-    return get_client._client

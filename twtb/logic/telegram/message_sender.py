@@ -4,7 +4,6 @@ import typing as t
 from telethon.tl.custom.message import Message as TelethonMessage
 
 from twtb.logic.shared.abstractions import AbstractSender
-from twtb.logic.telegram import get_client
 
 
 class TelegramSender(AbstractSender):
@@ -17,7 +16,5 @@ class TelegramSender(AbstractSender):
             users_ids: List of user IDs, which need to get the message.
             message: Telegram message object to send.
         """
-        client = get_client()
-
         for user_id in users_ids:
-            await client.forward_messages(user_id, message)
+            await self._client.forward_messages(user_id, message)

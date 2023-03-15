@@ -29,7 +29,7 @@ async def _on_message(event: telethon.events.NewMessage.Event) -> None:
     if event.chat_id not in channels:
         return
 
-    await MessageHandler().handle(event.message.message, event.message)
+    await MessageHandler(event.client).handle(event.message.message, event.message)
 
 
 def _get_slash_start_message() -> t.Dict[str, t.Any]:  # type: ignore[misc] # Explicit "Any" is not allowed

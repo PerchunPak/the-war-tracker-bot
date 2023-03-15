@@ -2,11 +2,15 @@
 import abc
 import typing as t
 
+import telethon
 from telethon.tl.custom.message import Message as TelethonMessage
 
 
 class AbstractSender(abc.ABC):
     """Abstraction for the class, that will send a message to users."""
+
+    def __init__(self, client: telethon.TelegramClient) -> None:
+        self._client = client
 
     @abc.abstractmethod
     async def send_message(self, users_ids: t.List[int], message: TelethonMessage) -> None:

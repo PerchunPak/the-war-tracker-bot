@@ -1,4 +1,5 @@
 """Module for the :class:`.MessageHandler` class."""
+import telethon
 from telethon.tl.custom.message import Message as TelethonMessage
 
 from twtb.logic.shared.db import Database
@@ -8,9 +9,9 @@ from twtb.logic.shared.message_sender import MessageSender
 class MessageHandler:
     """Handles message to know if they should be sent to user."""
 
-    def __init__(self) -> None:
+    def __init__(self, client: telethon.TelegramClient) -> None:
         self._db = Database()
-        self._sender = MessageSender()
+        self._sender = MessageSender(client)
 
     async def handle(self, to_handle: str, message: TelethonMessage) -> None:
         """Handles message to know if they should be sent to user.

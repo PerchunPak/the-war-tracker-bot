@@ -2,6 +2,7 @@
 import functools
 import typing as t
 
+import telethon
 from telethon.tl.custom.message import Message as TelethonMessage
 
 from twtb.logic.shared.abstractions import AbstractSender
@@ -10,12 +11,15 @@ from twtb.logic.shared.abstractions import AbstractSender
 class MessageSender:
     """Iterates over all realisations of :class:`~twtb.logic.shared.abstractions.AbstractSender` and calls them."""
 
+    def __init__(self, client: telethon.TelegramClient) -> None:
+        self._client = client
+
     @functools.cached_property
     def _senders(self) -> t.List[AbstractSender]:
         """Getter for list of realisations of :class:`~twtb.logic.shared.abstractions.AbstractSender`."""
         from twtb.logic.telegram.message_sender import TelegramSender
 
-        return [TelegramSender()]
+        return [TelegramSender(self._client)]
 
     async def send_message(self, users_ids: t.List[int], message: TelethonMessage) -> None:
         """Iterate over all realisations of :class:`~twtb.logic.shared.abstractions.AbstractSender` and call them.
