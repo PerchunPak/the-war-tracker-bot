@@ -89,6 +89,11 @@ class ListMySubscribesButtonHandler(ButtonHandler):
     async def handle(self, event: telethon.events.CallbackQuery.Event) -> None:  # noqa: D102
         database = Database()
         subscribes = await database.get_user_words(event.chat_id)
+
+        if len(subscribes) == 0:
+            await event.respond("You are not subscribed to anything yet!")
+            return
+
         await event.respond("Your subscribes:\n" + "\n".join(subscribes))
 
 
@@ -100,6 +105,10 @@ class ListKnownChannelsButtonHandler(ButtonHandler):
     async def handle(self, event: telethon.events.CallbackQuery.Event) -> None:  # noqa: D102
         database = Database()
         channels = await database.get_all_channels()
+
+        if len(channels) == 0:
+            await event.respond("No channels were added yet!")
+            return
 
         human_friendly_names: t.List[str] = []
         for channel in channels:
