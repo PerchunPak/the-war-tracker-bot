@@ -9,6 +9,7 @@ import typing_extensions as te
 from omegaconf import dictconfig
 
 from twtb import utils
+from twtb.logic.shared.db import DatabaseConfigSection
 from twtb.logic.telegram.config import TelegramConfigSection
 
 BASE_DIR = pathlib.Path(__file__).parent.parent
@@ -19,6 +20,7 @@ class Config(metaclass=utils.Singleton):
     """The main config that holds everything in itself."""
 
     telegram: TelegramConfigSection = dataclasses.field(default_factory=TelegramConfigSection)
+    db: DatabaseConfigSection = dataclasses.field(default_factory=DatabaseConfigSection)
 
     @classmethod
     def _setup(cls) -> te.Self:

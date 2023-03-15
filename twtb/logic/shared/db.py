@@ -2,10 +2,12 @@
 
 Currently, there is no need to implement it now.
 """
+import dataclasses
 import typing as t
 
 import redis.asyncio as redis
 
+import twtb.config
 import twtb.utils
 
 
@@ -19,7 +21,10 @@ class Database(metaclass=twtb.utils.Singleton):
     """
 
     def __init__(self) -> None:
-        self._connection: redis.Redis[bytes] = redis.Redis()
+        self._config = twtb.config.Config()
+        self._connection: redis.Redis[bytes] = redis.Redis(
+            host=self._config.db.host, port=self._config.db.port, password=self._config.db.password
+        )
 
     async def subscribe_user(self, user: str, word: str) -> None:
         """Subscribe user to the word."""
@@ -66,3 +71,12 @@ class Database(metaclass=twtb.utils.Singleton):
                 result[word].append(user_to_send)
 
         return result
+
+
+@dataclasses.dataclass
+class DatabaseConfigSection:
+    """Database configuration section."""
+
+    host: str = "localhost"
+    port: int = 6379
+    password: t.Optional[str] = None
