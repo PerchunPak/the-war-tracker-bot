@@ -1376,6 +1376,7 @@ category = "dev"
 optional = false
 python-versions = "<3.12,>=3.7"
 files = [
+    {file = "pytest-testmon-1.4.5.tar.gz", hash = "sha256:6fbbc63fb2d56b64d70197cae2ecbcf8074f81a1a174944a829b29f24ca2603d"},
     {file = "pytest_testmon-1.4.5-py3-none-any.whl", hash = "sha256:313424d868c0924596f710d49506c554dce78be85b96553a433141626e870ef1"},
 ]
 
