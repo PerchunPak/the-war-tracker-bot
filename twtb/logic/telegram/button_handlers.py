@@ -6,6 +6,7 @@ import typing as t
 import telethon.events
 import telethon.tl.functions.channels
 import telethon.tl.types
+from loguru import logger
 from telethon.tl.types import Channel
 
 from twtb.logic.shared.db import Database
@@ -17,13 +18,18 @@ class ButtonHandler(abc.ABC):
 
     handles: ButtonData
 
-    @abc.abstractmethod
     async def handle(self, event: telethon.events.CallbackQuery.Event) -> None:
         """Handle button.
 
         Args:
             event: Telethon's event.
         """
+        logger.trace(f"Handling {event.data} button with {type(self).__name__} from {event.sender_id}.")
+        return await self._handle(event)
+
+    @abc.abstractmethod
+    async def _handle(self, event: telethon.events.CallbackQuery.Event) -> None:
+        ...
 
     @classmethod
     def get_handler(cls, button_data: ButtonData) -> "ButtonHandler":
@@ -46,18 +52,19 @@ class SubscribeToWordButtonHandler(ButtonHandler):
 
     handles = ButtonData.SUBSCRIBE_TO_WORD
 
-    async def handle(self, event: telethon.events.CallbackQuery.Event) -> None:  # noqa: D102
+    async def _handle(self, event: telethon.events.CallbackQuery.Event) -> None:  # noqa: D102
         try:
             async with event.client.conversation(event.chat) as conversation:
                 await conversation.send_message("What word do you want to subscribe to?")
                 word = (await conversation.get_response()).text
         except (asyncio.TimeoutError, ValueError):
+            logger.trace(f"User {event.sender_id} took too long to respond")
             await event.respond("You took too long to respond :(")
             raise
 
         database = Database()
 
-        await database.subscribe_user(event.chat_id, word)
+        await database.subscribe_user(event.sender_id, word)
         await event.respond("Done!")
 
 
@@ -66,19 +73,23 @@ class UnsubscribeFromWordButtonHandler(ButtonHandler):
 
     handles = ButtonData.UNSUBSCRIBE_FROM_WORD
 
-    async def handle(self, event: telethon.events.CallbackQuery.Event) -> None:  # noqa: D102
+    async def _handle(self, event: telethon.events.CallbackQuery.Event) -> None:
         try:
             async with event.client.conversation(event.chat) as conversation:
                 await conversation.send_message("What word do you want to unsubscribe from?")
                 word = (await conversation.get_response()).text
         except (asyncio.TimeoutError, ValueError):
+            logger.trace(f"User {event.sender_id} took too long to respond")
             await event.respond("You took too long to respond :(")
             raise
 
         database = Database()
 
-        is_removed = await database.unsubscribe_user(event.chat_id, word)
+        is_removed = await database.unsubscribe_user(event.sender_id, word)
         await event.respond("Done!" if is_removed else "You are not subscribed to this word!")
+        logger.trace(
+            f"User {event.sender_id} {f'is unsubscribed from the word {word!r}' if is_removed else f'was not subscribed to the word {word!r}, but tried to unsubscribe.'}"
+        )
 
 
 class ListMySubscribesButtonHandler(ButtonHandler):
@@ -86,9 +97,9 @@ class ListMySubscribesButtonHandler(ButtonHandler):
 
     handles = ButtonData.LIST_MY_SUBSCRIBES
 
-    async def handle(self, event: telethon.events.CallbackQuery.Event) -> None:  # noqa: D102
+    async def _handle(self, event: telethon.events.CallbackQuery.Event) -> None:  # noqa: D102
         database = Database()
-        subscribes = await database.get_user_words(event.chat_id)
+        subscribes = await database.get_user_words(event.sender_id)
 
         if len(subscribes) == 0:
             await event.respond("You are not subscribed to anything yet!")
@@ -102,11 +113,12 @@ class ListKnownChannelsButtonHandler(ButtonHandler):
 
     handles = ButtonData.LIST_KNOWN_CHANNELS
 
-    async def handle(self, event: telethon.events.CallbackQuery.Event) -> None:  # noqa: D102
+    async def _handle(self, event: telethon.events.CallbackQuery.Event) -> None:  # noqa: D102
         database = Database()
         channels = await database.get_all_channels()
 
         if len(channels) == 0:
+            logger.warning("No channels were added yet!")
             await event.respond("No channels were added yet!")
             return
 
@@ -125,22 +137,27 @@ class AddChannelButtonHandler(ButtonHandler):
 
     handles = ButtonData.ADD_CHANNEL
 
-    async def handle(self, event: telethon.events.CallbackQuery.Event) -> None:  # noqa: D102
+    async def _handle(self, event: telethon.events.CallbackQuery.Event) -> None:  # noqa: D102
         try:
             async with event.client.conversation(event.chat) as conversation:
                 await conversation.send_message("What channel do you want to add?")
                 raw_channel = (await conversation.get_response()).text
         except (asyncio.TimeoutError, ValueError):
+            logger.trace(f"User {event.sender_id} took too long to respond")
             await event.respond("You took too long to respond :(")
             raise
 
         try:
             channel = await event.client.get_entity(raw_channel)
         except ValueError:
+            logger.trace(f"Channel {raw_channel!r} that gave {event.sender_id} was not found.")
             await event.respond("Channel not found!")
             return
 
         if not isinstance(channel, Channel):
+            logger.trace(
+                f"Channel {raw_channel!r} that gave {event.sender_id} is not a channel, but is {type(channel).__name__}."
+            )
             await event.respond("This is not a channel!")
             return
 

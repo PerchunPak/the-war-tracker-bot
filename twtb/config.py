@@ -10,6 +10,7 @@ from omegaconf import dictconfig
 
 from twtb import utils
 from twtb.logic.shared.db import DatabaseConfigSection
+from twtb.logic.shared.logging import LoggingConfigSection
 from twtb.logic.telegram.config import TelegramConfigSection
 
 BASE_DIR = pathlib.Path(__file__).parent.parent
@@ -19,6 +20,7 @@ BASE_DIR = pathlib.Path(__file__).parent.parent
 class Config(metaclass=utils.Singleton):
     """The main config that holds everything in itself."""
 
+    logging: LoggingConfigSection = dataclasses.field(default_factory=LoggingConfigSection)
     telegram: TelegramConfigSection = dataclasses.field(default_factory=TelegramConfigSection)
     db: DatabaseConfigSection = dataclasses.field(default_factory=DatabaseConfigSection)
 

@@ -3,6 +3,7 @@
 import typing as t
 
 import telethon.events.common
+from loguru import logger
 from telethon.tl.custom import Button
 
 from twtb.logic.shared.db import Database
@@ -13,6 +14,7 @@ from twtb.logic.telegram.data import ButtonData
 
 def register(bot: telethon.TelegramClient, client: telethon.TelegramClient) -> None:
     """Register the hooks in this file."""
+    logger.trace("Registering hooks...")
     client.on(telethon.events.NewMessage())(_on_message)
     bot.on(telethon.events.NewMessage(pattern="/start"))(_start_command)
     bot.on(telethon.events.CallbackQuery())(_button_callback)
@@ -20,9 +22,11 @@ def register(bot: telethon.TelegramClient, client: telethon.TelegramClient) -> N
 
 async def _on_message(event: telethon.events.NewMessage.Event) -> None:
     """Hook for ``on_message`` event."""
+    logger.trace(f"New message on client! (id={event.message.id})")
     database = Database()
     channels = await database.get_all_channels()
-    if event.chat_id not in channels:
+    if event.sender_id not in channels:
+        logger.trace(f"Message {event.message.id} (by {event.sender_id}) is not in subscribed channels.")
         return
 
     await MessageHandler(event.client).handle(event.message.message, event.message)
@@ -46,9 +50,11 @@ def _get_slash_start_message() -> t.Dict[str, t.Any]:  # type: ignore[misc] # Ex
 
 
 async def _start_command(event: telethon.events.NewMessage.Event) -> None:
+    logger.trace(f"{event.sender_id} used /start")
     await event.respond(**_get_slash_start_message())
 
 
 async def _button_callback(event: telethon.events.CallbackQuery.Event) -> None:
+    logger.trace(f"{event.sender_id} used button with {event.data=}")
     await ButtonHandler.get_handler(ButtonData(event.data)).handle(event)
     await event.respond(**_get_slash_start_message())
