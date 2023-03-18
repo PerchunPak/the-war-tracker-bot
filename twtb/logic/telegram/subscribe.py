@@ -17,7 +17,7 @@ async def run_periodical_subscribing(client: telethon.TelegramClient, bot: telet
     """
     logger.trace("Starting periodical subscribing...")
     while True:
-        await subscribe_to_all_channels(client, bot)
+        asyncio.create_task(subscribe_to_all_channels(client, bot))
         await asyncio.sleep(60)
 
 
