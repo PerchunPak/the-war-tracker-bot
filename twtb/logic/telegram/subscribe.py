@@ -47,5 +47,7 @@ async def subscribe_to_all_channels(client: telethon.TelegramClient, bot: teleth
             continue
 
         await client(telethon.tl.functions.channels.JoinChannelRequest(entity.username))  # subscribe
-        await client(telethon.tl.functions.account.UpdateNotifySettingsRequest(entity.username))  # disable notifications
+        await client(
+            telethon.tl.functions.account.UpdateNotifySettingsRequest(entity.username)
+        )  # disable notifications
         await client.edit_folder(entity, 1)  # move to archive
