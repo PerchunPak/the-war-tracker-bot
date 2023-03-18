@@ -1,6 +1,7 @@
 """Module for Telegram-relative settings."""
 import abc
 import dataclasses
+import typing as t
 
 
 @dataclasses.dataclass
@@ -16,7 +17,7 @@ class ClientSection(ClientOrBotSection):
     """Config for client specific settings."""
 
     phone: str = "???"
-    password: str = "???"
+    password: t.Optional[str] = None
 
 
 @dataclasses.dataclass
