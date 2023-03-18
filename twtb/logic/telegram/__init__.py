@@ -17,11 +17,11 @@ def run() -> None:
     loop = asyncio.get_event_loop()
 
     logger.debug("Connecting to bot account...")
-    bot = telethon.TelegramClient("bot", tg_config.bot.api_id, tg_config.bot.api_hash).start(
+    bot = telethon.TelegramClient("data/bot", tg_config.bot.api_id, tg_config.bot.api_hash).start(
         bot_token=tg_config.bot.bot_token
     )
     logger.debug("Connecting to client account...")
-    client = telethon.TelegramClient("client", tg_config.client.api_id, tg_config.client.api_hash).start(
+    client = telethon.TelegramClient("data/client", tg_config.client.api_id, tg_config.client.api_hash).start(
         phone=tg_config.client.phone, password=tg_config.client.password
     )
     logger.info("Connected to bot and client accounts!")

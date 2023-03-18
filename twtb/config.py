@@ -20,9 +20,9 @@ BASE_DIR = pathlib.Path(__file__).parent.parent
 class Config(metaclass=utils.Singleton):
     """The main config that holds everything in itself."""
 
-    logging: LoggingConfigSection = dataclasses.field(default_factory=LoggingConfigSection)
-    telegram: TelegramConfigSection = dataclasses.field(default_factory=TelegramConfigSection)
     db: DatabaseConfigSection = dataclasses.field(default_factory=DatabaseConfigSection)
+    telegram: TelegramConfigSection = dataclasses.field(default_factory=TelegramConfigSection)
+    logging: LoggingConfigSection = dataclasses.field(default_factory=LoggingConfigSection)
 
     @classmethod
     def _setup(cls) -> te.Self:
@@ -33,17 +33,18 @@ class Config(metaclass=utils.Singleton):
         Returns:
             :py:class:`.Config` instance.
         """
-        config_path = BASE_DIR / "config.yml"
+        config_path = BASE_DIR / "data" / "config.yml"
+        config_path.parent.mkdir(exist_ok=True)
         cfg = omegaconf.OmegaConf.structured(cls)
 
         if config_path.exists():
             loaded_config = omegaconf.OmegaConf.load(config_path)
             cfg = omegaconf.OmegaConf.merge(cfg, loaded_config)
 
+        cls._handle_env_variables(cfg)
+
         with open(config_path, "w") as config_file:
             omegaconf.OmegaConf.save(cfg, config_file)
-
-        cls._handle_env_variables(cfg)
 
         return t.cast(te.Self, cfg)
 

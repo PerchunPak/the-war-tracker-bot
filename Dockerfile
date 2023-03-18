@@ -30,5 +30,6 @@ COPY twtb/ twtb/
 FROM base AS final
 RUN chown -R 5000:5000 /app
 USER container
+VOLUME /app/data
 
 CMD ["dumb-init", "python", "twtb"]
