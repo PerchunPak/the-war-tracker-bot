@@ -34,7 +34,7 @@ class Database(metaclass=twtb.utils.Singleton):
     async def subscribe_user(self, user: str, word: str) -> None:
         """Subscribe user to the word."""
         logger.debug(f"Subscribing {user} to {word=}")
-        await self._connection.rpush(user, word)
+        await self._connection.sadd(user, word)
 
     async def unsubscribe_user(self, user: str, word: str) -> bool:
         """Unsubscribe user from the word.
@@ -43,20 +43,20 @@ class Database(metaclass=twtb.utils.Singleton):
             Whether word was removed.
         """
         logger.debug(f"Unsubscribing {user} from {word=}")
-        return bool(await self._connection.lrem(user, 0, word))
+        return bool(await self._connection.srem(user, 0, word))
 
     async def add_channel(self, id: int) -> None:
         """Add channel to our database."""
         logger.info(f"Adding channel {id} to our database")
-        await self._connection.rpush(self._CHANNELS_KEY, id)
+        await self._connection.sadd(self._CHANNELS_KEY, id)
 
     async def get_all_channels(self) -> t.List[int]:
         """Get all channels from database."""
-        return list(map(lambda e: int(e.decode()), await self._connection.lrange(self._CHANNELS_KEY, 0, -1)))
+        return list(map(lambda e: int(e.decode()), await self._connection.smembers(self._CHANNELS_KEY)))
 
     async def get_user_words(self, user_id: int) -> t.List[str]:
         """Get all words, which the user is subscribed to."""
-        return t.cast(t.List[str], list(map(lambda e: e.decode(), await self._connection.lrange(str(user_id), 0, -1))))
+        return t.cast(t.List[str], list(map(lambda e: e.decode(), await self._connection.smembers(str(user_id)))))
 
     async def get_all_subscribed_words(self) -> t.Dict[str, t.List[int]]:
         """Get all words, that we need to listen.
