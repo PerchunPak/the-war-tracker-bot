@@ -48,12 +48,20 @@ class Config(metaclass=utils.Singleton):
         return t.cast(te.Self, cfg)
 
     @staticmethod
-    def _handle_env_variables(cfg: dictconfig.DictConfig) -> None:
+    def _handle_env_variables(cfg: dictconfig.DictConfig, *, prefix: t.Optional[str] = None) -> None:
         """Process all values, and redef them with values from env variables.
 
         Args:
             cfg: :py:class:`.Config` instance.
+            prefix:
+                Prefix for env variable. Example ``prefix="telegram"`` and
+                ``key="token"`` will look for ``TELEGRAM_TOKEN``.
         """
         for key in cfg:
-            if str(key).upper() in os.environ:
+            key_to_look_for = f"{prefix}_{key!r}" if prefix else str(key)
+            if isinstance(cfg[key], dictconfig.DictConfig):
+                Config._handle_env_variables(cfg[key], prefix=key_to_look_for)
+                continue
+
+            if key_to_look_for.upper() in os.environ:
                 cfg[str(key)] = os.environ[str(key).upper()]
