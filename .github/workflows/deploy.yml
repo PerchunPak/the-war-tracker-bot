@@ -27,6 +27,8 @@ jobs:
       uses: docker/metadata-action@v4
       with:
         images: perchunpak/the-war-tracker-bot
+        flavor: |
+          latest=true
         tags: |
           type=semver,pattern={{version}}
           type=raw,value=dev

@@ -117,6 +117,8 @@ jobs:
       uses: docker/metadata-action@v4
       with:
         images: perchunpak/the-war-tracker-bot
+        flavor: |
+          latest=true
         # semantic versions in another workflow
         tags: |
           type=raw,value=dev
