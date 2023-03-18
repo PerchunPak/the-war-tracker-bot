@@ -39,7 +39,7 @@ def run() -> None:
 
 async def run_both_client_and_bot(client: telethon.TelegramClient, bot: telethon.TelegramClient) -> None:
     """Run both the client and the bot."""
-    logger.trace("Running both the client and the bot...")
+    logger.info("Running both the client and the bot... After a while, the app is ready to use!")
     done, pending = await asyncio.wait(
         {
             asyncio.create_task(client._run_until_disconnected(), name="Client"),
