@@ -47,3 +47,4 @@ async def subscribe_to_all_channels(client: telethon.TelegramClient, bot: teleth
             continue
 
         await client(telethon.tl.functions.channels.JoinChannelRequest(entity.username))
+        await client(telethon.tl.functions.account.UpdateNotifySettingsRequest(entity.username))
