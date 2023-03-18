@@ -3,8 +3,6 @@ import abc
 import asyncio
 import typing as t
 
-import telethon.events
-import telethon.tl.functions.channels
 import telethon.tl.types
 from loguru import logger
 from telethon.tl.types import Channel
