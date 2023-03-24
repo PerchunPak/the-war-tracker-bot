@@ -27,9 +27,22 @@ RUN pip install --no-cache-dir -U pip && \
 COPY twtb/ twtb/
 
 
+FROM base AS git
+# Write version for the Sentry 'release' option
+# (`apt-get update` because without it `package not found`, even if this update already was in `base` step)
+RUN apt-get update && \
+    apt-get install git -y --no-install-recommends
+COPY .git .git
+RUN git rev-parse HEAD > /commit.txt
+
+
 FROM base AS final
+
+COPY --from=git /commit.txt commit.txt
 RUN chown -R 5000:5000 /app
 USER container
 VOLUME /app/data
+
+ENV SENTRY_ENVIRONMENT "docker"
 
 CMD ["dumb-init", "python", "twtb"]

@@ -11,6 +11,7 @@ from omegaconf import dictconfig
 from twtb import utils
 from twtb.logic.shared.db import DatabaseConfigSection
 from twtb.logic.shared.logging import LoggingConfigSection
+from twtb.logic.shared.sentry_config import SentryConfigSection
 from twtb.logic.telegram.config import TelegramConfigSection
 
 BASE_DIR = pathlib.Path(__file__).parent.parent
@@ -23,6 +24,7 @@ class Config(metaclass=utils.Singleton):
     db: DatabaseConfigSection = dataclasses.field(default_factory=DatabaseConfigSection)
     telegram: TelegramConfigSection = dataclasses.field(default_factory=TelegramConfigSection)
     logging: LoggingConfigSection = dataclasses.field(default_factory=LoggingConfigSection)
+    sentry: SentryConfigSection = dataclasses.field(default_factory=SentryConfigSection)
 
     @classmethod
     def _setup(cls) -> te.Self:

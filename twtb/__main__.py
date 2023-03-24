@@ -1,13 +1,14 @@
 """Entrypoint for the whole application."""
 from loguru import logger
 
+import twtb.utils as utils
 from twtb.logic.telegram import run as run_tg_bot
-from twtb.utils import setup_logging
 
 
 def main() -> None:
     """The main function, that starts everything."""
-    setup_logging()
+    utils.setup_logging()
+    utils.start_sentry()
     logger.info("Hello World!")
     run_tg_bot()
 
