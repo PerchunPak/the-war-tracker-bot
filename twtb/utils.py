@@ -75,6 +75,9 @@ def start_sentry() -> None:
         traces_sample_rate=config.sentry.traces_sample_rate,
         release=_get_commit(BASE_DIR / "commit.txt"),
         environment=config.sentry.environment,
+        _experiments={
+            "profiles_sample_rate": 1.0,
+        }
     )
 
 
