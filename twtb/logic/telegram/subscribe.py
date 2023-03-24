@@ -28,7 +28,9 @@ async def subscribe_to_all_channels(client: telethon.TelegramClient, bot: teleth
         client: Telethon's client. Must not be bot.
         bot: Telethon's bot object. We use it to get information about channels. See comment below in sources.
     """
+    logger.trace("Subscribing to all channels...")
     channels = await Database().get_all_channels()
+
     for channel in channels:
         # Somewhy, telegram do not want to give us information about channels
         # by id from client account, so we firstly get it from bot account and
@@ -48,6 +50,8 @@ async def subscribe_to_all_channels(client: telethon.TelegramClient, bot: teleth
 
         await client(telethon.tl.functions.channels.JoinChannelRequest(entity.username))  # subscribe
         await client(
-            telethon.tl.functions.account.UpdateNotifySettingsRequest(entity.username)
+            telethon.tl.functions.account.UpdateNotifySettingsRequest(
+                peer=entity.username, settings=telethon.tl.types.InputPeerNotifySettings(silent=True)
+            )
         )  # disable notifications
-        await client.edit_folder(entity, 1)  # move to archive
+        await client.edit_folder(entity.id, 1)  # move to archive
