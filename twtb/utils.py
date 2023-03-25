@@ -77,7 +77,7 @@ def start_sentry() -> None:
         environment=config.sentry.environment,
         _experiments={
             "profiles_sample_rate": 1.0,
-        }
+        },
     )
 
 
