@@ -8,50 +8,40 @@ from loguru import logger
 from twtb.logic.shared.db import Database
 
 
-async def run_periodical_subscribing(client: telethon.TelegramClient, bot: telethon.TelegramClient) -> None:
+async def run_periodical_subscribing(client: telethon.TelegramClient) -> None:
     """Run periodical subscribing to all channels in the database.
 
     Args:
         client: Telethon's client object. Must not be bot.
-        bot: Telethon's bot object. We use it to get information about channels. See comment below in sources.
     """
     logger.trace("Starting periodical subscribing...")
     while True:
-        asyncio.create_task(subscribe_to_all_channels(client, bot))
+        asyncio.create_task(subscribe_to_all_channels(client))
         await asyncio.sleep(60)
 
 
-async def subscribe_to_all_channels(client: telethon.TelegramClient, bot: telethon.TelegramClient) -> None:
+async def subscribe_to_all_channels(client: telethon.TelegramClient) -> None:
     """Subscribe to all channels in the database.
 
     Args:
         client: Telethon's client. Must not be bot.
-        bot: Telethon's bot object. We use it to get information about channels. See comment below in sources.
     """
     logger.trace("Subscribing to all channels...")
     channels = await Database().get_all_channels()
 
-    for channel in channels:
-        # Somewhy, telegram do not want to give us information about channels
-        # by id from client account, so we firstly get it from bot account and
-        # then use username in subscribe request.
-        #
-        # It can be quite tricky, as username can be None.
-        entity = await bot.get_entity(channel)
-        logger.opt(lazy=True).trace(
-            "Subscribing to {channel}...",
-            channel=lambda: f"{entity.title} ({'@' + entity.username if entity.username else f'ID: {entity.id}'})",
-        )
-        if entity.username is None:
-            logger.warning(
-                f"Channel {channel} has no username, skipping from subscribing. Please, report this!"
-            )  # TODO can we automatise reporting about this?
-            continue
+    if len(channels) == 0:
+        logger.warning("No channels were added yet!")
+        return
 
-        await client(telethon.tl.functions.channels.JoinChannelRequest(entity.username))  # subscribe
+    channels_info = (await client(telethon.tl.functions.messages.GetPeerDialogsRequest(peers=channels))).chats
+
+    for channel in map(lambda channel: channel.username, filter(lambda channel: channel.left, channels_info)):  # type: ignore[no-any-return]
+        logger.trace(f"Subscribing to {channel}...")
+
+        await client(telethon.tl.functions.channels.JoinChannelRequest(channel))  # subscribe
         await client(
             telethon.tl.functions.account.UpdateNotifySettingsRequest(
-                peer=entity.username, settings=telethon.tl.types.InputPeerNotifySettings(silent=True)
+                peer=channel, settings=telethon.tl.types.InputPeerNotifySettings(mute_until=2**31 - 1)
             )
         )  # disable notifications
-        await client.edit_folder(entity.id, 1)  # move to archive
+        await client.edit_folder(channel, 1)  # move to archive

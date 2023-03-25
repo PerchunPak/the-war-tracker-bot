@@ -27,7 +27,7 @@ def run() -> None:
     logger.info("Connected to bot and client accounts!")
 
     register_hooks(bot, client)
-    loop.create_task(run_periodical_subscribing(client, bot))
+    loop.create_task(run_periodical_subscribing(client))
 
     with bot, client:
         try:

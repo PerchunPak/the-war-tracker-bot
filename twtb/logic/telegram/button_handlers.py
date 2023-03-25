@@ -5,7 +5,6 @@ import typing as t
 
 import telethon.tl.types
 from loguru import logger
-from telethon.tl.types import Channel
 
 from twtb.logic.shared.db import Database
 from twtb.logic.telegram.data import ButtonData
@@ -122,10 +121,8 @@ class ListKnownChannelsButtonHandler(ButtonHandler):
 
         human_friendly_names: t.List[str] = []
         for channel in channels:
-            entity = await event.client.get_entity(channel)
-            human_friendly_names.append(
-                f"{entity.title} ({'@' + entity.username if entity.username else f'ID: {entity.id}'})"
-            )
+            entity = await database.channels_info.get_and_save(channel, event.client)
+            human_friendly_names.append(f"{entity.title} (@{entity.username})")
 
         await event.respond("Known channels:\n" + "\n".join(human_friendly_names))
 
@@ -139,27 +136,14 @@ class AddChannelButtonHandler(ButtonHandler):
         try:
             async with event.client.conversation(event.chat) as conversation:
                 await conversation.send_message("What channel do you want to add?")
-                raw_channel = (await conversation.get_response()).text
+                channel = (await conversation.get_response()).text
         except (asyncio.TimeoutError, ValueError):
             logger.trace(f"User {event.sender_id} took too long to respond")
             await event.respond("You took too long to respond :(")
             raise
 
-        try:
-            channel = await event.client.get_entity(raw_channel)
-        except ValueError:
-            logger.trace(f"Channel {raw_channel!r} that gave {event.sender_id} was not found.")
-            await event.respond("Channel not found!")
-            return
-
-        if not isinstance(channel, Channel):
-            logger.trace(
-                f"Channel {raw_channel!r} that gave {event.sender_id} is not a channel, but is {type(channel).__name__}."
-            )
-            await event.respond("This is not a channel!")
-            return
-
         database = Database()
+        entity = await database.channels_info.get_and_save(channel, event.client)
 
-        await database.add_channel(channel.id)
+        await database.add_channel(entity.username)
         await event.respond("Done!")
