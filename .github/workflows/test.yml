@@ -52,7 +52,7 @@ jobs:
 
     - name: Apply codestyle
       run: |
-        poetry run make style
+        poetry run make format
 
     - name: Commit changes
       run: |
