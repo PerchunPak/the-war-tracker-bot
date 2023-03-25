@@ -7,6 +7,10 @@ import telethon.tl.types
 from loguru import logger
 
 from twtb.logic.shared.db import Database
+from twtb.logic.shared.db.channels_info import (
+    ChannelNotFoundOrIsInvalidError,
+    ProvidedIdIsNotAChannelError,
+)
 from twtb.logic.telegram.data import ButtonData
 
 
@@ -143,7 +147,19 @@ class AddChannelButtonHandler(ButtonHandler):
             raise
 
         database = Database()
-        entity = await database.channels_info.get_and_save(channel, event.client)
+
+        try:
+            entity = await database.channels_info.get_and_save(channel, event.client)
+        except ChannelNotFoundOrIsInvalidError:
+            logger.trace(f"Channel {channel!r} that gave {event.sender.username!r} was not found.")
+            await event.respond("Channel not found!")
+            return
+        except ProvidedIdIsNotAChannelError:
+            logger.trace(
+                f"Channel {channel!r} that gave {event.sender_id} is not a channel, but is {type(channel).__name__}."
+            )
+            await event.respond("This is not a channel!")
+            return
 
         await database.add_channel(entity.username)
         await event.respond("Done!")

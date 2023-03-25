@@ -7,6 +7,7 @@ import redis.asyncio as redis
 import telethon
 import typing_extensions as te
 from loguru import logger
+from telethon.tl.types import Channel
 
 import twtb.logic.shared.db as db_pkg
 import twtb.utils
@@ -38,6 +39,23 @@ class ChannelInfo:
             logger.warning(f"Channel {self.title!r} doesn't have username, please report this!")  # type: ignore[unreachable]
 
 
+class ChannelNotFoundOrIsInvalidError(Exception):
+    """Exception raised when you try to get and save channel, which doesn't exist or is invalid."""
+
+    def __init__(self, channel_name: str) -> None:
+        self.channel_name = channel_name
+        super().__init__(f"Channel {channel_name!r} not found or it's invalid.")
+
+
+class ProvidedIdIsNotAChannelError(Exception):
+    """Exception raised when you try to get and save something, which is not a channel."""
+
+    def __init__(self, channel_name: str, actual_type_name: str) -> None:
+        self.channel_name = channel_name
+        self.actual_type_name = actual_type_name
+        super().__init__(f"Channel {channel_name!r} is not a channel, but is {actual_type_name!r}.")
+
+
 class ChannelInfoInDB(metaclass=twtb.utils.Singleton):
     """Class for storing channel info in database."""
 
@@ -59,7 +77,13 @@ class ChannelInfoInDB(metaclass=twtb.utils.Singleton):
         """Get channel info from database, and save it if it's not there."""
         channel_info = await self.get(id)
         if channel_info is None:
-            tg_entity = await client.get_entity(id)
+            try:
+                tg_entity = await client.get_entity(id)
+            except telethon.errors.rpcerrorlist.UsernameInvalidError:
+                raise ChannelNotFoundOrIsInvalidError(id)
+
+            if not isinstance(tg_entity, Channel):
+                raise ProvidedIdIsNotAChannelError(id, type(tg_entity).__name__)
 
             channel_info = ChannelInfo(title=tg_entity.title, username=tg_entity.username)
 
