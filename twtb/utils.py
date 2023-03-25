@@ -1,4 +1,5 @@
 """Module for some of our utils."""
+import os
 import pathlib
 import sys
 import typing as t
@@ -74,7 +75,7 @@ def start_sentry() -> None:
         dsn=config.sentry.dsn,
         traces_sample_rate=config.sentry.traces_sample_rate,
         release=_get_commit(BASE_DIR / "commit.txt"),
-        environment=config.sentry.environment,
+        environment=os.environ.get("SENTRY_ENVIRONMENT", "development"),
         _experiments={
             "profiles_sample_rate": 1.0,
         },

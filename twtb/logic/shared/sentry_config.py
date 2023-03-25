@@ -9,8 +9,3 @@ class SentryConfigSection:
     enabled: bool = True
     dsn: str = "..."
     traces_sample_rate: float = 1.0
-    environment: str = "development"
-    """The environment that the app is running in.
-
-    Handled automatically in Docker.
-    """

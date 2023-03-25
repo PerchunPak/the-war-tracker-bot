@@ -43,6 +43,6 @@ RUN chown -R 5000:5000 /app
 USER container
 VOLUME /app/data
 
-ENV SENTRY_ENVIRONMENT "docker"
+ENV SENTRY_ENVIRONMENT "production"
 
 CMD ["dumb-init", "python", "twtb"]
