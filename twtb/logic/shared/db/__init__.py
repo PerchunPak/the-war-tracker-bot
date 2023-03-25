@@ -1,34 +1,19 @@
-"""An empty module for future database system.
-
-Currently, there is no need to implement it now.
-"""
+"""The package for the database system."""
 import asyncio
 import dataclasses
-import json
 import re
 import typing as t
 
 import redis.asyncio as redis
-import telethon
-import typing_extensions as te
 from loguru import logger
 
 import twtb.config
 import twtb.utils
+from twtb.logic.shared.db.channels_info import ChannelInfoInDB
+
+__all__ = ["Database", "DatabaseConfigSection"]
 
 TELEGRAM_USERNAME_REGEX = re.compile(r"^[a-zA-Z_0-9]+$")
-
-
-def _remove_prefix(string: str, prefix: str) -> str:
-    if string.startswith(prefix):
-        return string[len(prefix) :]
-    return string
-
-
-def _remove_suffix(string: str, suffix: str) -> str:
-    if string.endswith(suffix):
-        return string[: len(suffix) * -1]
-    return string
 
 
 def _optimize_channel_id(id: str) -> str:
@@ -36,8 +21,8 @@ def _optimize_channel_id(id: str) -> str:
 
     id = id.lower()
     for prefix in ["https://", "http://", "@", "t.me/"]:
-        id = _remove_prefix(id, prefix)
-    id = _remove_suffix(id, ".t.me")
+        id = twtb.utils.remove_prefix(id, prefix)
+    id = twtb.utils.remove_suffix(id, ".t.me")
 
     if not re.match(TELEGRAM_USERNAME_REGEX, id):
         logger.error(f"Can't optimize channel ID properly: {before!r} -> {id!r}")
@@ -113,62 +98,6 @@ class Database(metaclass=twtb.utils.Singleton):
                 result[word].append(user_to_send)
 
         return result
-
-
-@dataclasses.dataclass
-class ChannelInfo:
-    """Database configuration section."""
-
-    title: str
-    username: str
-
-    def to_json(self) -> str:
-        """Transforms self to JSON string."""
-        return json.dumps(dataclasses.asdict(self))
-
-    @classmethod
-    def from_json(cls, data: str) -> te.Self:
-        """Creates instance from JSON string."""
-        parsed = json.loads(data)
-        return cls(title=parsed["title"], username=parsed["username"])
-
-    def __post_init__(self) -> None:
-        """The annotations in telethon say that username can be None.
-
-        This will check for that, and report into logs.
-        """
-        if self.username is None:
-            logger.warning(f"Channel {self.title!r} doesn't have username, please report this!")  # type: ignore[unreachable]
-
-
-class ChannelInfoInDB(metaclass=twtb.utils.Singleton):
-    """Class for storing channel info in database."""
-
-    def __init__(self, connection: "redis.Redis[bytes]") -> None:
-        self._connection = connection
-
-    async def get(self, id: str) -> t.Optional[ChannelInfo]:
-        """Get channel info from database."""
-        id = _optimize_channel_id(id)
-        as_json = await self._connection.get(f"channel_info:{id}")
-        return ChannelInfo.from_json(as_json.decode()) if as_json is not None else as_json
-
-    async def set(self, id: str, value: ChannelInfo, *, expire: t.Optional[float] = None) -> None:
-        """Set channel info in database."""
-        id = _optimize_channel_id(id)
-        await self._connection.set("channel_info:" + id, value.to_json(), ex=expire)
-
-    async def get_and_save(self, id: str, client: telethon.TelegramClient) -> ChannelInfo:
-        """Get channel info from database, and save it if it's not there."""
-        channel_info = await self.get(id)
-        if channel_info is None:
-            tg_entity = await client.get_entity(id)
-
-            channel_info = ChannelInfo(title=tg_entity.title, username=tg_entity.username)
-
-            await self.set(id, channel_info, expire=604800)  # 7 days
-
-        return channel_info
 
 
 @dataclasses.dataclass

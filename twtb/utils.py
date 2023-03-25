@@ -91,3 +91,17 @@ def _get_commit(commit_txt_path: pathlib.Path) -> t.Optional[str]:
         commit = commit_txt_file.read().strip()
         logger.info(f"Current commit is: {commit}")
         return commit
+
+
+def remove_prefix(string: str, prefix: str) -> str:
+    """Remove prefix from the string."""
+    if string.startswith(prefix):
+        return string[len(prefix) :]
+    return string
+
+
+def remove_suffix(string: str, suffix: str) -> str:
+    """Remove suffix from the string."""
+    if string.endswith(suffix):
+        return string[: len(suffix) * -1]
+    return string
