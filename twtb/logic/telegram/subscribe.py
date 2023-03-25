@@ -38,10 +38,12 @@ async def subscribe_to_all_channels(client: telethon.TelegramClient) -> None:
     for channel in map(lambda channel: channel.username, filter(lambda channel: channel.left, channels_info)):  # type: ignore[no-any-return]
         logger.trace(f"Subscribing to {channel}...")
 
-        await client(telethon.tl.functions.channels.JoinChannelRequest(channel))  # subscribe
         await client(
-            telethon.tl.functions.account.UpdateNotifySettingsRequest(
-                peer=channel, settings=telethon.tl.types.InputPeerNotifySettings(mute_until=2**31 - 1)
-            )
-        )  # disable notifications
+            [
+                telethon.tl.functions.channels.JoinChannelRequest(channel),  # subscribe
+                telethon.tl.functions.account.UpdateNotifySettingsRequest(
+                    peer=channel, settings=telethon.tl.types.InputPeerNotifySettings(mute_until=2**31 - 1)
+                ),  # disable notifications
+            ]
+        )
         await client.edit_folder(channel, 1)  # move to archive
