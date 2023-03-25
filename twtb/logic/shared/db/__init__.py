@@ -1,10 +1,10 @@
 """The package for the database system."""
 import asyncio
 import dataclasses
-import re
 import typing as t
 
 import redis.asyncio as redis
+import telethon.utils
 from loguru import logger
 
 import twtb.config
@@ -12,22 +12,6 @@ import twtb.utils
 from twtb.logic.shared.db.channels_info import ChannelInfoInDB
 
 __all__ = ["Database", "DatabaseConfigSection"]
-
-TELEGRAM_USERNAME_REGEX = re.compile(r"^[a-zA-Z_0-9]+$")
-
-
-def _optimize_channel_id(id: str) -> str:
-    before = id
-
-    id = id.lower()
-    for prefix in ["https://", "http://", "@", "t.me/"]:
-        id = twtb.utils.remove_prefix(id, prefix)
-    id = twtb.utils.remove_suffix(id, ".t.me")
-
-    if not re.match(TELEGRAM_USERNAME_REGEX, id):
-        logger.error(f"Can't optimize channel ID properly: {before!r} -> {id!r}")
-
-    return id
 
 
 class Database(metaclass=twtb.utils.Singleton):
@@ -61,7 +45,7 @@ class Database(metaclass=twtb.utils.Singleton):
 
     async def add_channel(self, id: str) -> None:
         """Add channel to our database."""
-        id = _optimize_channel_id(id)
+        id = telethon.utils.parse_username(id)[0]
         logger.info(f"Adding channel {id} to our database")
         await self._connection.sadd("channels", id)
 

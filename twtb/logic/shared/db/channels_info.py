@@ -5,11 +5,11 @@ import typing as t
 
 import redis.asyncio as redis
 import telethon
+import telethon.utils
 import typing_extensions as te
 from loguru import logger
 from telethon.tl.types import Channel
 
-import twtb.logic.shared.db as db_pkg
 import twtb.utils
 
 
@@ -62,20 +62,28 @@ class ChannelInfoInDB(metaclass=twtb.utils.Singleton):
     def __init__(self, connection: "redis.Redis[bytes]") -> None:
         self._connection = connection
 
-    async def get(self, id: str) -> t.Optional[ChannelInfo]:
+    async def get(self, id: str, *, _optimize: bool = True) -> t.Optional[ChannelInfo]:
         """Get channel info from database."""
-        id = db_pkg._optimize_channel_id(id)
+        if _optimize:
+            id = telethon.utils.parse_username(id)[0]
+
         as_json = await self._connection.get(f"channel_info:{id}")
         return ChannelInfo.from_json(as_json.decode()) if as_json is not None else as_json
 
-    async def set(self, id: str, value: ChannelInfo, *, expire: t.Optional[float] = None) -> None:
+    async def set(
+        self, id: str, value: ChannelInfo, *, expire: t.Optional[float] = None, _optimize: bool = True
+    ) -> None:
         """Set channel info in database."""
-        id = db_pkg._optimize_channel_id(id)
+        if _optimize:
+            id = telethon.utils.parse_username(id)[0]
+
         await self._connection.set("channel_info:" + id, value.to_json(), ex=expire)
 
     async def get_and_save(self, id: str, client: telethon.TelegramClient) -> ChannelInfo:
         """Get channel info from database, and save it if it's not there."""
-        channel_info = await self.get(id)
+        id = telethon.utils.parse_username(id)[0]
+        channel_info = await self.get(id, _optimize=False)
+
         if channel_info is None:
             try:
                 tg_entity = await client.get_entity(id)
@@ -87,6 +95,6 @@ class ChannelInfoInDB(metaclass=twtb.utils.Singleton):
 
             channel_info = ChannelInfo(title=tg_entity.title, username=tg_entity.username)
 
-            await self.set(id, channel_info, expire=604800)  # 7 days
+            await self.set(id, channel_info, _optimize=False, expire=604800)  # 7 days
 
         return channel_info
