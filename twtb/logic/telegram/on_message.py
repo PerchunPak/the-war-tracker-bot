@@ -23,10 +23,12 @@ def register(bot: telethon.TelegramClient, client: telethon.TelegramClient) -> N
 async def _on_message(event: telethon.events.NewMessage.Event) -> None:
     """Hook for ``on_message`` event."""
     logger.trace(f"New message on client! (id={event.message.id})")
+
     database = Database()
     channels = await database.get_all_channels()
-    if event.message.sender.username not in channels:
-        logger.trace(f"Message {event.message.id} (by {event.message.sender.username}) is not in subscribed channels.")
+    sender = event.message.sender if event.message.sender is not None else await event.message.get_sender()
+    if sender.username not in channels:
+        logger.trace(f"Message {event.message.id} (by {sender.username}) is not in subscribed channels.")
         return
 
     await MessageHandler(event.client).handle(event.message.message, event.message)
