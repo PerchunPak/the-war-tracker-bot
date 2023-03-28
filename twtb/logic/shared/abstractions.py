@@ -13,7 +13,7 @@ class AbstractSender(abc.ABC):
     def __init__(self, bot: telethon.TelegramClient) -> None:
         self._bot = bot
 
-    async def send_message(self, users_ids: t.List[int], message: TelethonMessage) -> None:
+    async def send_message(self, users_ids: t.Set[int], message: TelethonMessage) -> None:
         """Send message to users.
 
         Args:
@@ -24,5 +24,5 @@ class AbstractSender(abc.ABC):
         return await self._send_message(users_ids, message)
 
     @abc.abstractmethod
-    async def _send_message(self, users_ids: t.List[int], message: TelethonMessage) -> None:
+    async def _send_message(self, users_ids: t.Set[int], message: TelethonMessage) -> None:
         ...

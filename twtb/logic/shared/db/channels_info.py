@@ -72,12 +72,12 @@ class ChannelInfoInDB(metaclass=twtb.utils.Singleton):
 
     async def set(
         self, id: str, value: ChannelInfo, *, expire: t.Optional[float] = None, _optimize: bool = True
-    ) -> None:
+    ) -> bool:
         """Set channel info in database."""
         if _optimize:
             id = telethon.utils.parse_username(id)[0]
 
-        await self._connection.set("channel_info:" + id, value.to_json(), ex=expire)
+        return bool(await self._connection.set("channel_info:" + id, value.to_json(), ex=expire))
 
     async def get_and_save(self, id: str, client: telethon.TelegramClient) -> ChannelInfo:
         """Get channel info from database, and save it if it's not there."""

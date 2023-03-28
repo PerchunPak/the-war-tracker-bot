@@ -34,7 +34,7 @@ async def subscribe_to_all_channels(client: telethon.TelegramClient) -> None:
         logger.warning("No channels were added yet!")
         return
 
-    channels_info = await get_info_about_channels(client, set(channels))
+    channels_info = await get_info_about_channels(client, channels)
 
     for channel in map(lambda channel: channel.username, filter(lambda channel: channel.left, channels_info)):  # type: ignore[no-any-return]
         logger.trace(f"Subscribing to {channel}...")
@@ -67,8 +67,7 @@ async def get_info_about_channels(
             channel_name = exception.__context__.request.username
             logger.info(f"Added channel {channel_name!r} does not exist!")
 
-            if channel_name in channels:
-                await Database().delete_channel(channel_name)
+            if channel_name in channels and await Database().delete_channel(channel_name):
                 channels.discard(channel_name)
             else:
                 logger.error(f"Channel (that doesn't exist) is not in the database! {channel_name=}")

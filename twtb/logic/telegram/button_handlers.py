@@ -65,8 +65,8 @@ class SubscribeToWordButtonHandler(ButtonHandler):
 
         database = Database()
 
-        await database.subscribe_user(event.sender_id, word)
-        await event.respond("Done!")
+        is_subscribed = await database.subscribe_user(event.sender_id, word)
+        await event.respond("Done!" if is_subscribed else "You are already subscribed to this word!")
 
 
 class UnsubscribeFromWordButtonHandler(ButtonHandler):
@@ -161,5 +161,5 @@ class AddChannelButtonHandler(ButtonHandler):
             await event.respond("This is not a channel!")
             return
 
-        await database.add_channel(entity.username)
-        await event.respond("Done!")
+        is_added = await database.add_channel(entity.username)
+        await event.respond("Done!" if is_added else "This channel is already added!")

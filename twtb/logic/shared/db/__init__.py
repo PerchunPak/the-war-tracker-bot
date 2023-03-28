@@ -29,10 +29,14 @@ class Database(metaclass=twtb.utils.Singleton):
 
         asyncio.ensure_future(self._connection.ping())
 
-    async def subscribe_user(self, user: int, word: str) -> None:
-        """Subscribe user to the word."""
+    async def subscribe_user(self, user: int, word: str) -> bool:
+        """Subscribe user to the word.
+
+        Returns:
+            Whether user was subscribed.
+        """
         logger.debug(f"Subscribing {user} to {word=}")
-        await self._connection.sadd(f"user_words:{user}", word)
+        return bool(await self._connection.sadd(f"user_words:{user}", word))
 
     async def unsubscribe_user(self, user: int, word: str) -> bool:
         """Unsubscribe user from the word.
@@ -43,49 +47,57 @@ class Database(metaclass=twtb.utils.Singleton):
         logger.debug(f"Unsubscribing {user} from {word=}")
         return bool(await self._connection.srem(f"user_words:{user}", 0, word))
 
-    async def add_channel(self, id: str) -> None:
-        """Add channel to our database."""
+    async def add_channel(self, id: str) -> bool:
+        """Add channel to our database.
+
+        Returns:
+            Whether channel was added.
+        """
         id = telethon.utils.parse_username(id)[0]
         logger.info(f"Adding channel {id} to our database")
-        await self._connection.sadd("channels", id)
+        return bool(await self._connection.sadd("channels", id))
 
-    async def delete_channel(self, id: str) -> None:
-        """Delete channel from our database."""
+    async def delete_channel(self, id: str) -> bool:
+        """Delete channel from our database.
+
+        Returns:
+            Whether channel was deleted.
+        """
         id = telethon.utils.parse_username(id)[0]
         logger.info(f"Deleting channel {id} from our database")
-        await self._connection.srem("channels", id)
+        return bool(await self._connection.srem("channels", id))
 
-    async def get_all_channels(self) -> t.List[str]:
+    async def get_all_channels(self) -> t.Set[str]:
         """Get all channels from database."""
-        return list(map(lambda e: e.decode(), await self._connection.smembers("channels")))
+        return set(map(lambda e: e.decode(), await self._connection.smembers("channels")))
 
-    async def get_user_words(self, user_id: int) -> t.List[str]:
+    async def get_user_words(self, user_id: int) -> t.Set[str]:
         """Get all words, which the user is subscribed to."""
         return t.cast(
-            t.List[str], list(map(lambda e: e.decode(), await self._connection.smembers(f"user_words:{user_id}")))
+            t.Set[str], set(map(lambda e: e.decode(), await self._connection.smembers(f"user_words:{user_id}")))
         )
 
-    async def get_all_subscribed_words(self) -> t.Dict[str, t.List[int]]:
+    async def get_all_subscribed_words(self) -> t.Dict[str, t.Set[int]]:
         """Get all words, that we need to listen.
 
         Returns:
             A :class:`dict` where key is a word to listen, and value - a :class:`list` of users to forward message.
         """
-        logger.trace("Getting all subscribed words")  # This is kind of expensive operation, so it should be logged
+        logger.debug("Getting all subscribed words")
 
-        user_to_words: t.Dict[int, t.List[str]] = {
+        user_to_words: t.Dict[int, t.Set[str]] = {
             (decoded_id := int(user_id[11:].decode())): await self.get_user_words(decoded_id)
             for user_id in await self._connection.keys("user_words:*")
         }
 
-        result: t.Dict[str, t.List[int]] = {}
+        result: t.Dict[str, t.Set[int]] = {}
 
         for user_to_send, user_words in user_to_words.items():
             for word in user_words:
                 if result.get(word) is None:
-                    result[word] = [user_to_send]
+                    result[word] = {user_to_send}
                     continue
-                result[word].append(user_to_send)
+                result[word].add(user_to_send)
 
         return result
 

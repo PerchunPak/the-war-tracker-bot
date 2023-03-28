@@ -15,13 +15,13 @@ class MessageSender:
         self._bot = bot
 
     @functools.cached_property
-    def _senders(self) -> t.List[AbstractSender]:
+    def _senders(self) -> t.Set[AbstractSender]:
         """Getter for list of realisations of :class:`~twtb.logic.shared.abstractions.AbstractSender`."""
         from twtb.logic.telegram.message_sender import TelegramSender
 
-        return [TelegramSender(self._bot)]
+        return {TelegramSender(self._bot)}
 
-    async def send_message(self, users_ids: t.List[int], message: TelethonMessage) -> None:
+    async def send_message(self, users_ids: t.Set[int], message: TelethonMessage) -> None:
         """Iterate over all realisations of :class:`~twtb.logic.shared.abstractions.AbstractSender` and call them.
 
         Args:
