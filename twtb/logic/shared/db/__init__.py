@@ -49,6 +49,12 @@ class Database(metaclass=twtb.utils.Singleton):
         logger.info(f"Adding channel {id} to our database")
         await self._connection.sadd("channels", id)
 
+    async def delete_channel(self, id: str) -> None:
+        """Delete channel from our database."""
+        id = telethon.utils.parse_username(id)[0]
+        logger.info(f"Deleting channel {id} from our database")
+        await self._connection.srem("channels", id)
+
     async def get_all_channels(self) -> t.List[str]:
         """Get all channels from database."""
         return list(map(lambda e: e.decode(), await self._connection.smembers("channels")))
