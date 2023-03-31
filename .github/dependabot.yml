@@ -17,7 +17,6 @@ updates:
     - dependency-name: "isort"
     - dependency-name: "pycln"
     - dependency-name: "doc8"
-    - dependency-name: "mypy"
     - dependency-name: "flake8"
     - dependency-name: "flake8-docstrings"
     - dependency-name: "flake8-ensure-ascii"
@@ -33,6 +32,15 @@ updates:
     - dependency-name: "pytest-testmon"
     - dependency-name: "pytest-randomly"
     - dependency-name: "Faker"
+    # Typing group
+    - dependency-name: "mypy"
+    - dependency-name: "types-docutils"
+    - dependency-name: "types-mock"
+    - dependency-name: "types-pyopenssl"
+    - dependency-name: "types-pytz"
+    - dependency-name: "types-pyyaml"
+    - dependency-name: "types-redis"
+    - dependency-name: "types-setuptools"
     # Docs group
     - dependency-name: "sphinx"
     - dependency-name: "sphinx-autodoc-typehints"
