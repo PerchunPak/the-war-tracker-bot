@@ -62,7 +62,7 @@ async def get_info_about_channels(
     """
     try:
         peer_dialogs = await client(telethon.tl.functions.messages.GetPeerDialogsRequest(peers=channels))
-    except ValueError as exception:
+    except TypeError as exception:
         if isinstance(exception.__context__, telethon.errors.rpcerrorlist.UsernameNotOccupiedError):
             channel_name = exception.__context__.request.username
             logger.info(f"Added channel {channel_name!r} does not exist!")
