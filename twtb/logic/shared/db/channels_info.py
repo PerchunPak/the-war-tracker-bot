@@ -15,7 +15,7 @@ import twtb.utils
 
 @dataclasses.dataclass
 class ChannelInfo:
-    """Database configuration section."""
+    """Class for channel info into object instead of :class:`dict`."""
 
     title: str
     username: str
