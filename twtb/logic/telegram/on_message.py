@@ -27,7 +27,7 @@ async def _on_message(event: telethon.events.NewMessage.Event) -> None:
     database = Database()
     channels = await database.get_all_channels()
     sender = event.message.sender if event.message.sender is not None else await event.message.get_sender()
-    if sender.username not in channels:
+    if sender.username is not None and sender.username.lower() not in channels:
         logger.trace(f"Message {event.message.id} (by {sender.username}) is not in subscribed channels.")
         return
 
