@@ -154,9 +154,9 @@ class AddChannelButtonHandler(ButtonHandler):
             logger.trace(f"Channel {channel!r} that gave {event.sender.username!r} was not found.")
             await event.respond("Channel not found!")
             return
-        except ProvidedIdIsNotAChannelError:
+        except ProvidedIdIsNotAChannelError as exception:
             logger.trace(
-                f"Channel {channel!r} that gave {event.sender_id} is not a channel, but is {type(channel).__name__}."
+                f"Channel {exception.channel_name!r} that gave {event.sender_id} is not a channel, but is {exception.actual_type_name}."
             )
             await event.respond("This is not a channel!")
             return
