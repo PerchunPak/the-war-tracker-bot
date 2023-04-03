@@ -4,6 +4,7 @@ import typing as t
 from telethon.tl.custom.message import Message as TelethonMessage
 
 from twtb.logic.shared.abstractions import AbstractSender
+from twtb.logic.shared.db import Database
 
 
 class TelegramSender(AbstractSender):
@@ -16,8 +17,7 @@ class TelegramSender(AbstractSender):
             users_ids: List of user IDs, which need to get the message.
             message: Telegram message object to send.
         """
-        # TODO the system doesn't work, because we need to transfer message ID to the bot from client
-        # and only then it's possible to forward the message to the user
-        return
-        # for user_id in users_ids:
-        #     await self._bot.forward_messages(user_id, message)
+        db = Database()
+        is_duplicate = await db.sharing_message.set(db.sharing_message.hash_message(message), users_ids)
+        if not is_duplicate:
+            await message.forward_to(await db.sharing_message.get_shared_chat(client=True))

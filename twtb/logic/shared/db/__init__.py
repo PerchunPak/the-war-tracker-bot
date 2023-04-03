@@ -10,6 +10,7 @@ from loguru import logger
 import twtb.config
 import twtb.utils
 from twtb.logic.shared.db.channels_info import ChannelInfoInDB
+from twtb.logic.shared.db.sharing_message import SharingMessageInDB
 
 __all__ = ["Database", "DatabaseConfigSection"]
 
@@ -26,6 +27,7 @@ class Database(metaclass=twtb.utils.Singleton):
             password=self._config.db.password,
         )
         self.channels_info = ChannelInfoInDB(self._connection)
+        self.sharing_message = SharingMessageInDB(self._connection)
 
         asyncio.ensure_future(self._connection.ping())
 
