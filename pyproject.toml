@@ -21,7 +21,7 @@ omegaconf = "~2.3"
 loguru = "~0.6"
 
 typing-extensions = "*"
-telethon = "~1.27"
+telethon = "~1.28"
 redis = "~4.5"
 Babel = "~2.12"
 sentry-sdk = "^1.19.0"
