@@ -36,7 +36,7 @@ async def subscribe_to_all_channels(client: telethon.TelegramClient) -> None:
 
     channels_info = await get_info_about_channels(client, channels)
 
-    for channel in map(lambda channel: channel.username, filter(lambda channel: channel.left, channels_info)):  # type: ignore[no-any-return]
+    for channel in map(lambda channel: channel.username, filter(lambda channel: channel.left, channels_info)):
         logger.trace(f"Subscribing to {channel}...")
 
         await client(telethon.tl.functions.channels.JoinChannelRequest(channel))  # subscribe
