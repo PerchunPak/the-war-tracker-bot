@@ -61,12 +61,12 @@ pytest-cov = "~4.1"
 pytest-mock = "~3.11"
 pytest-testmon = "~2.0"
 pytest-randomly = "~3.13"
-Faker = "~18.13"
+Faker = "~19.2"
 
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "~7.0"
-sphinx-autodoc-typehints = "~1.23"
+sphinx-autodoc-typehints = "~1.24"
 sphinx-autoapi = "~2.1"
 sphinx-intl = "~2.1"  # only for locales
 furo = "*"
