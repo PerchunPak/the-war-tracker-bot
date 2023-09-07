@@ -40,7 +40,7 @@ safety = "~2.3"
 cruft = "~2.15"
 lice = "~0.6"  # for generating template
 
-pre-commit = "~3.3"
+pre-commit = "~3.4"
 
 
 [tool.poetry.group.typing.dependencies]
