@@ -23,7 +23,7 @@ loguru = "~0.7"
 typing-extensions = "*"
 telethon = "~1.30"
 redis = "~5.0"
-Babel = "~2.12"
+Babel = "~2.13"
 sentry-sdk = "^1.31.0"
 
 
